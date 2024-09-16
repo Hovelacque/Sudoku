@@ -22,7 +22,7 @@
             /* border: 0px; */
             height: 50px;
             width: 50px;
-            border: 1px dashed;
+            border: 1px dashed #d1cece;
             /* color: white; */
             /* border-radius: 10px; */
             font-size: 40px;
@@ -30,20 +30,38 @@
 
         .cell-left {
             border-left-style: solid;
-            border-left-color: blue;
+            border-left-color: black;
         }
 
         .cell-right {
             border-right-style: solid;
-            border-right-color: red;
+            border-right-color: black;
         }
 
         .cell-top {
             border-top-style: solid;
+            border-top-color: black;
         }
 
         .cell-bottom {
             border-bottom-style: solid;
+            border-bottom-color: black;
+        }
+
+        .border-left {
+            border-left-width: 2px;
+        }
+
+        .border-right {
+            border-right-width: 2px;
+        }
+
+        .border-top {
+            border-top-width: 2px;
+        }
+
+        .border-bottom {
+            border-bottom-width: 2px;
         }
 
         .selected {
@@ -86,7 +104,7 @@
         const tabuleiro = [];
         const contadores = [];
         const cellSelected = {
-            i: 0, j: 0
+            i: 0, j: 0, value: 0
         }
 
         function iniciaJogo() {
@@ -96,6 +114,7 @@
                     linha.push(0);
                 tabuleiro.push(linha);
             }
+
             for (let i = 0; i < 9; i++)
                 contadores.push(9)
         }
@@ -103,6 +122,7 @@
         function clickCell(i, j) {
             cellSelected.i = i;
             cellSelected.j = j;
+            cellSelected.value = tabuleiro[cellSelected.i][cellSelected.j];
             desenhaJogo();
         }
 
@@ -112,27 +132,41 @@
             for (let i = 0; i < 9; i++) {
                 for (let j = 0; j < 9; j++) {
                     let classe = 'cell ';
-                    if (i == cellSelected.i && j == cellSelected.j)
-                        classe += 'selected '
+                    if (i == cellSelected.i && j == cellSelected.j || cellSelected.value > 0 && tabuleiro[i][j] == cellSelected.value)
+                        classe += ' selected '
 
-                    if (j == 0 || j % 3 == 0)
-                        classe += 'cell-left '
+                    if (i == 0)
+                        classe += 'border-top '
+                    if (i == 8)
+                        classe += 'border-bottom '
+                    if (j == 8)
+                        classe += 'border-right '
+                    if (j == 0)
+                        classe += 'border-left '
+
+                    if (i == 0 || i % 3 == 0)
+                        classe += 'cell-top '
+                    if (i == 8 || (i + 1) % 3 == 0)
+                        classe += 'cell-bottom '
                     if (j == 8 || (j + 1) % 3 == 0)
                         classe += 'cell-right '
+                    if (j == 0 || j % 3 == 0)
+                        classe += 'cell-left '
 
-                    game.innerHTML += `<button class="${classe}" onclick="clickCell(${i}, ${j})">
-                        ${tabuleiro[i][j] > 0 ? tabuleiro[i][j] : ''}
-                    </button>`
+                    game.innerHTML += `<button class="${classe}" onclick="clickCell(${i}, ${j})">${tabuleiro[i][j] > 0 ? tabuleiro[i][j] : ''}</button>`
                 }
             }
         }
 
         function clickCount(numero) {
-            if (tabuleiro[cellSelected.i][cellSelected.j] > 0)
-                contadores[tabuleiro[cellSelected.i][cellSelected.j] - 1]++;
-            tabuleiro[cellSelected.i][cellSelected.j] = numero;
-            contadores[numero - 1]--;
-            desenhaJogo();
+            if (contadores[numero - 1] > 0) {
+                if (tabuleiro[cellSelected.i][cellSelected.j] > 0)
+                    contadores[tabuleiro[cellSelected.i][cellSelected.j] - 1]++;
+                tabuleiro[cellSelected.i][cellSelected.j] = numero;
+                cellSelected.value = numero;
+                contadores[numero - 1]--;
+                desenhaJogo();
+            }
         }
 
         function desenhaContadores() {
