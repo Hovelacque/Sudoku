@@ -1,0 +1,157 @@
+<html>
+
+<head>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #game {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+            /* background-color: #773d94;
+            border-radius: 5px; */
+        }
+
+        .cell {
+            background-color: white;
+            /* margin: 10px; */
+            /* border: 0px; */
+            height: 50px;
+            width: 50px;
+            border: 1px dashed;
+            /* color: white; */
+            /* border-radius: 10px; */
+            font-size: 40px;
+        }
+
+        .cell-left {
+            border-left-style: solid;
+            border-left-color: blue;
+        }
+
+        .cell-right {
+            border-right-style: solid;
+            border-right-color: red;
+        }
+
+        .cell-top {
+            border-top-style: solid;
+        }
+
+        .cell-bottom {
+            border-bottom-style: solid;
+        }
+
+        .selected {
+            background-color: #88bbfb;
+        }
+
+        #counts {
+            display: flex;
+        }
+
+        .item {
+            background-color: white;
+            border: 1px solid;
+            border-radius: 5px;
+            font-size: 50px;
+            height: 150px;
+            width: 75px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            margin-right: 5px;
+            margin-top: 5px;
+        }
+
+        .contador {
+            font-size: 25px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Sudoku</h1>
+    <div id="game"></div>
+    <div id="counts"></div>
+
+    <script>
+        const game = document.querySelector('#game');
+        const counts = document.querySelector('#counts');
+        const tabuleiro = [];
+        const contadores = [];
+        const cellSelected = {
+            i: 0, j: 0
+        }
+
+        function iniciaJogo() {
+            for (let i = 0; i < 9; i++) {
+                const linha = [];
+                for (let j = 0; j < 9; j++)
+                    linha.push(0);
+                tabuleiro.push(linha);
+            }
+            for (let i = 0; i < 9; i++)
+                contadores.push(9)
+        }
+
+        function clickCell(i, j) {
+            cellSelected.i = i;
+            cellSelected.j = j;
+            desenhaJogo();
+        }
+
+        function desenhaTabuleiro() {
+            console.log(tabuleiro);
+            game.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                    let classe = 'cell ';
+                    if (i == cellSelected.i && j == cellSelected.j)
+                        classe += 'selected '
+
+                    if (j == 0 || j % 3 == 0)
+                        classe += 'cell-left '
+                    if (j == 8 || (j + 1) % 3 == 0)
+                        classe += 'cell-right '
+
+                    game.innerHTML += `<button class="${classe}" onclick="clickCell(${i}, ${j})">
+                        ${tabuleiro[i][j] > 0 ? tabuleiro[i][j] : ''}
+                    </button>`
+                }
+            }
+        }
+
+        function clickCount(numero) {
+            if (tabuleiro[cellSelected.i][cellSelected.j] > 0)
+                contadores[tabuleiro[cellSelected.i][cellSelected.j] - 1]++;
+            tabuleiro[cellSelected.i][cellSelected.j] = numero;
+            contadores[numero - 1]--;
+            desenhaJogo();
+        }
+
+        function desenhaContadores() {
+            console.log(contadores);
+            counts.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                counts.innerHTML += `<button class="item" onclick="clickCount(${i + 1})">${i + 1}<div class="contador">${contadores[i]}</div></button>`
+            }
+        }
+
+        function desenhaJogo() {
+            desenhaTabuleiro();
+            desenhaContadores();
+        }
+
+        iniciaJogo()
+        desenhaJogo();
+
+    </script>
+</body>
+
+</html>
