@@ -81,7 +81,7 @@
             border: 1px solid;
             border-radius: 5px;
             font-size: 50px;
-            height: 150px;
+            height: 100px;
             width: 75px;
             display: flex;
             flex-direction: column;
@@ -94,12 +94,27 @@
         .contador {
             font-size: 25px;
         }
+        
+        .btnAcao {
+            background-color: white;
+            border: 1px solid;
+            border-radius: 5px;
+            font-size: 25px;
+            height: 50px;
+            width: 200px;
+            margin-right: 5px;
+            margin-top: 5px;
+        }
     </style>
 </head>
 
 <body>
     <h1>Sudoku</h1>
     <div id="game"></div>
+    <div style="display: flex;">
+        <button class="btnAcao">Apagar</button>
+        <button class="btnAcao">Mostrar marca'coes</button>
+    </div>
     <div id="counts"></div>
 
     <script>
