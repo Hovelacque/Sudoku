@@ -68,6 +68,10 @@
             background-color: #88bbfb;
         }
 
+        .error {
+            color: red;
+        }
+
         #counts {
             display: flex;
         }
@@ -126,6 +130,18 @@
             desenhaJogo();
         }
 
+        function erroNaLogicaDoJogo(i, j) {
+            const indexLinha = tabuleiro[i].findIndex((cell, index) => cell == tabuleiro[i][j] && j != index);
+            return indexLinha > -1
+            // const linha = tabuleiro.findIndex((linha, _i)=>{
+            //     linha.findIndex((cell, _j)=>{
+
+            //     })
+            // });
+
+            // return true;
+        }
+
         function desenhaTabuleiro() {
             console.log(tabuleiro);
             game.innerHTML = '';
@@ -152,6 +168,9 @@
                         classe += 'cell-right '
                     if (j == 0 || j % 3 == 0)
                         classe += 'cell-left '
+
+                    if (erroNaLogicaDoJogo(i, j))
+                        classe += 'error '
 
                     game.innerHTML += `<button class="${classe}" onclick="clickCell(${i}, ${j})">${tabuleiro[i][j] > 0 ? tabuleiro[i][j] : ''}</button>`
                 }
