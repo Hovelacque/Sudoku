@@ -105,6 +105,12 @@
             margin-right: 5px;
             margin-top: 5px;
         }
+
+        .marcacao {
+            font-size: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
     </style>
 </head>
 
@@ -113,13 +119,14 @@
     <div id="game"></div>
     <div style="display: flex;">
         <button class="btnAcao" onclick="apagar()">Apagar</button>
-        <button class="btnAcao">Mostrar marcações</button>
+        <button class="btnAcao" onclick="switchMarcacao()">Mostrar marcações</button>
     </div>
     <div id="counts"></div>
 
     <script>
         const game = document.querySelector('#game');
         const counts = document.querySelector('#counts');
+        let mostrarMarcacoes = false;
         const tabuleiro = [];
         const contadores = [];
         const cellSelected = {
@@ -171,6 +178,38 @@
             return false;
         }
 
+        function definePossibilidades(linha, coluna) {
+            const opcoes = []
+            for (var valor = 1; valor <= 9; valor++) {
+                const indexLinha = tabuleiro[linha].findIndex((cell, index) => cell == valor);
+                if (indexLinha > -1)
+                    continue;
+
+                for (let i = 0; i < 9; i++)
+                    if (tabuleiro[i][coluna] == valor)
+                        continue;
+
+                const iQuadrante = (Math.floor(linha / 3) * 3);
+                const jQuadrante = (Math.floor(coluna / 3) * 3);
+
+                for (let i = iQuadrante; i < iQuadrante + 3; i++) {
+                    for (let j = jQuadrante; j < jQuadrante + 3; j++) {
+                        if (tabuleiro[i][j] == valor)
+                            continue;
+                    }
+                }
+
+                //passou...
+                opcoes.push(valor);
+            }
+
+            let ret = '';
+            for (var i = 0; i < opcoes.length; i++)
+                ret += `<div>${opcoes[i]}</div>`;
+
+            return ret;
+        }
+
         function desenhaTabuleiro() {
             game.innerHTML = '';
             for (let i = 0; i < 9; i++) {
@@ -200,7 +239,13 @@
                     if (erroNaLogicaDoJogo(i, j))
                         classe += 'error '
 
-                    game.innerHTML += `<button class="${classe}" onclick="clickCell(${i}, ${j})">${tabuleiro[i][j] > 0 ? tabuleiro[i][j] : ''}</button>`
+                    let innerHTML = tabuleiro[i][j] > 0 ? tabuleiro[i][j] : '';
+                    if (innerHTML == '' && mostrarMarcacoes) {
+                        classe += 'marcacao '
+                        innerHTML = definePossibilidades(i, j);
+                    }
+
+                    game.innerHTML += `<button class="${classe}" onclick="clickCell(${i}, ${j})">${innerHTML}</button>`
                 }
             }
         }
@@ -221,6 +266,11 @@
             contadores[numero - 1]++;
             tabuleiro[cellSelected.i][cellSelected.j] = 0;
             cellSelected.value = 0;
+            desenhaJogo();
+        }
+
+        function switchMarcacao() {
+            mostrarMarcacoes = !mostrarMarcacoes;
             desenhaJogo();
         }
 
