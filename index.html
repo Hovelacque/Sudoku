@@ -112,6 +112,11 @@
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
         }
+        
+        .estatico {
+            background-color: #bfbfbf;
+            color: white;
+        }
     </style>
 </head>
 
@@ -130,13 +135,15 @@
         let mostrarMarcacoes = false;
         const tabuleiro = [];
         const contadores = [];
+        let mapa = null
         const cellSelected = {
             i: 0,
             j: 0,
             value: 0
         }
 
-        function iniciaJogo(mapa) {
+        function iniciaJogo(_mapa) {
+            mapa = _mapa;
 
             for (let i = 0; i < 9; i++)
                 contadores.push(9)
@@ -232,6 +239,8 @@
                     let classe = 'cell ';
                     if (i == cellSelected.i && j == cellSelected.j || cellSelected.value > 0 && tabuleiro[i][j] == cellSelected.value)
                         classe += ' selected '
+                    else if (mapa[i][j] > 0)
+                        classe += 'estatico '
 
                     if (i == 0)
                         classe += 'border-top '
@@ -266,7 +275,7 @@
         }
 
         function clickCount(numero) {
-            if (contadores[numero - 1] > 0) {
+            if (contadores[numero - 1] > 0 && mapa[cellSelected.i][cellSelected.j] == 0) {
                 if (tabuleiro[cellSelected.i][cellSelected.j] > 0)
                     contadores[tabuleiro[cellSelected.i][cellSelected.j] - 1]++;
                 tabuleiro[cellSelected.i][cellSelected.j] = numero;
@@ -277,11 +286,13 @@
         }
 
         function apagar() {
-            const numero = tabuleiro[cellSelected.i][cellSelected.j];
-            contadores[numero - 1]++;
-            tabuleiro[cellSelected.i][cellSelected.j] = 0;
-            cellSelected.value = 0;
-            desenhaJogo();
+            if (mapa[cellSelected.i][cellSelected.j] == 0) {
+                const numero = tabuleiro[cellSelected.i][cellSelected.j];
+                contadores[numero - 1]++;
+                tabuleiro[cellSelected.i][cellSelected.j] = 0;
+                cellSelected.value = 0;
+                desenhaJogo();
+            }
         }
 
         function switchMarcacao() {
@@ -301,7 +312,7 @@
             desenhaContadores();
         }
 
-        iniciaJogo(branco)
+        iniciaJogo(medio)
     </script>
 </body>
 
