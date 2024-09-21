@@ -1,6 +1,7 @@
 <html>
 
 <head>
+    <script src="levels/branco.js"></script>
     <style>
         body {
             display: flex;
@@ -135,16 +136,27 @@
             value: 0
         }
 
-        function iniciaJogo() {
-            for (let i = 0; i < 9; i++) {
-                const linha = [];
-                for (let j = 0; j < 9; j++)
-                    linha.push(0);
-                tabuleiro.push(linha);
-            }
+        function iniciaJogo(mapa) {
 
             for (let i = 0; i < 9; i++)
                 contadores.push(9)
+
+            for (let i = 0; i < 9; i++) {
+                const linha = [];
+                for (let j = 0; j < 9; j++) {
+                    const valor = mapa[i][j];
+                    contadores[valor - 1]--;
+                    linha.push(valor);
+                }
+                tabuleiro.push(linha);
+            }
+
+
+            cellSelected.i = 0;
+            cellSelected.j = 0;
+            cellSelected.value = 0;
+
+            desenhaJogo();
         }
 
         function clickCell(i, j) {
@@ -289,8 +301,7 @@
             desenhaContadores();
         }
 
-        iniciaJogo()
-        desenhaJogo();
+        iniciaJogo(branco)
     </script>
 </body>
 
