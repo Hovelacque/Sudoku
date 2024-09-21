@@ -71,7 +71,7 @@
         }
         
         .error {
-            color: red;
+            color: red !important;
         }
         
         #counts {
@@ -118,6 +118,10 @@
             background-color: #bfbfbf;
             color: white;
         }
+        
+        .unicaOpcao {
+            color: red;
+        }
     </style>
 </head>
 
@@ -127,6 +131,7 @@
     <div style="display: flex;">
         <button class="btnAcao" onclick="apagar()">Apagar</button>
         <button class="btnAcao" onclick="switchMarcacao()">Mostrar marcações</button>
+        <button class="btnAcao" onclick="switchUnicaOpcao()">Mostrar unica opcao</button>
     </div>
     <div id="counts"></div>
 
@@ -134,6 +139,7 @@
         const game = document.querySelector('#game');
         const counts = document.querySelector('#counts');
         let mostrarMarcacoes = false;
+        let mostrarUnicaOpcao = false;
         const tabuleiro = [];
         const contadores = [];
         let mapa = null
@@ -298,6 +304,11 @@
 
         function switchMarcacao() {
             mostrarMarcacoes = !mostrarMarcacoes;
+            desenhaJogo();
+        }
+
+        function switchUnicaOpcao() {
+            mostrarUnicaOpcao = !mostrarUnicaOpcao;
             desenhaJogo();
         }
 
