@@ -1,65 +1,36 @@
 <html>
 
 <head>
-    <script src="levels/branco.js"></script>
-    <script src="levels/medio.js"></script>
-    <script src="levels/Level1.js"></script>
-    <script src="levels/livro1.js"></script>
+    <script src="gerador.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <h1>Sudoku</h1>
+    <h1>Gerador de Sudoku</h1>
     <div id="game"></div>
     <div style="display: flex;">
-        <button class="btnAcao" onclick="apagar()">Apagar</button>
-        <button class="btnAcao" onclick="switchMarcacao()">Mostrar marcações</button>
-        <button class="btnAcao" onclick="switchUnicaOpcao()">Mostrar única opção</button>
+        <button class="btnAcao" onclick="marcaProximo()">Marca próximo</button>
+        <button class="btnAcao" onclick="preencher()">Preencher</button>
     </div>
-    <div id="counts"></div>
 
     <script>
         const game = document.querySelector('#game');
-        const counts = document.querySelector('#counts');
-        let mostrarMarcacoes = false;
-        let mostrarUnicaOpcao = false;
+        let mostrarMarcacoes = true;
+        let mostrarUnicaOpcao = true;
         const tabuleiro = [];
-        const contadores = [];
-        let mapa = null
-        const cellSelected = {
-            i: 0,
-            j: 0,
-            value: 0
-        }
+        const possibilidades = [];
 
-        function iniciaJogo(_mapa) {
-            mapa = _mapa;
-
-            for (let i = 0; i < 9; i++)
-                contadores.push(9)
-
+        function iniciaJogoVazio() {
             for (let i = 0; i < 9; i++) {
                 const linha = [];
+                const l_possibilidades = [];
                 for (let j = 0; j < 9; j++) {
-                    const valor = mapa[i][j];
-                    contadores[valor - 1]--;
-                    linha.push(valor);
+                    linha.push(0);
+                    l_possibilidades.push([])
                 }
                 tabuleiro.push(linha);
+                possibilidades.push(l_possibilidades);
             }
-
-
-            cellSelected.i = 0;
-            cellSelected.j = 0;
-            cellSelected.value = 0;
-
-            desenhaJogo();
-        }
-
-        function clickCell(i, j) {
-            cellSelected.i = i;
-            cellSelected.j = j;
-            cellSelected.value = tabuleiro[cellSelected.i][cellSelected.j];
             desenhaJogo();
         }
 
@@ -111,14 +82,17 @@
                 //passou...
                 opcoes.push(valor);
             }
+            possibilidades[linha][coluna] = opcoes;
+        }
 
+        function desenhaPossibilidades(linha, coluna) {
+            const opcoes = possibilidades[linha][coluna];
             let ret = '';
             for (var i = 1; i <= 9; i++)
                 if (opcoes.findIndex(x => x == i) > -1)
                     ret += `<div>${i}</div>`;
                 else
                     ret += `<div> </div>`;
-
             return ret;
         }
 
@@ -192,11 +166,6 @@
             for (let i = 0; i < 9; i++) {
                 for (let j = 0; j < 9; j++) {
                     let classe = 'cell ';
-                    if (i == cellSelected.i && j == cellSelected.j || cellSelected.value > 0 && tabuleiro[i][j] == cellSelected.value)
-                        classe += ' selected '
-                    else if (mapa[i][j] > 0)
-                        classe += 'estatico '
-
                     if (i == 0)
                         classe += 'border-top '
                     if (i == 8)
@@ -221,65 +190,66 @@
                     let innerHTML = tabuleiro[i][j] > 0 ? tabuleiro[i][j] : '';
                     if (innerHTML == '' && mostrarMarcacoes) {
                         classe += 'marcacao '
-                        innerHTML = definePossibilidades(i, j);
+                        definePossibilidades(i, j);
+                        innerHTML = desenhaPossibilidades(i, j);
                     }
 
-                    game.innerHTML += `<button class="${classe}" 
-                    onclick="clickCell(${i}, ${j})"
-                    data-row="${i}"
-                    data-column="${j}">
+                    game.innerHTML += `<button class="${classe}" data-row="${i}" data-column="${j}">
                         ${innerHTML}
                     </button>`
                 }
             }
 
+            console.log(possibilidades)
             defineUnicaOpcao()
-        }
-
-        function clickCount(numero) {
-            if (contadores[numero - 1] > 0 && mapa[cellSelected.i][cellSelected.j] == 0) {
-                if (tabuleiro[cellSelected.i][cellSelected.j] > 0)
-                    contadores[tabuleiro[cellSelected.i][cellSelected.j] - 1]++;
-                tabuleiro[cellSelected.i][cellSelected.j] = numero;
-                cellSelected.value = numero;
-                contadores[numero - 1]--;
-                desenhaJogo();
-            }
-        }
-
-        function apagar() {
-            if (mapa[cellSelected.i][cellSelected.j] == 0) {
-                const numero = tabuleiro[cellSelected.i][cellSelected.j];
-                contadores[numero - 1]++;
-                tabuleiro[cellSelected.i][cellSelected.j] = 0;
-                cellSelected.value = 0;
-                desenhaJogo();
-            }
-        }
-
-        function switchMarcacao() {
-            mostrarMarcacoes = !mostrarMarcacoes;
-            desenhaJogo();
-        }
-
-        function switchUnicaOpcao() {
-            mostrarUnicaOpcao = !mostrarUnicaOpcao;
-            desenhaJogo();
-        }
-
-        function desenhaContadores() {
-            counts.innerHTML = '';
-            for (let i = 0; i < 9; i++) {
-                counts.innerHTML += `<button class="item" onclick="clickCount(${i + 1})">${i + 1}<div class="contador">${contadores[i]}</div></button>`
-            }
         }
 
         function desenhaJogo() {
             desenhaTabuleiro();
-            desenhaContadores();
         }
 
-        iniciaJogo(branco)
+        function marcaProximo() {
+            let celulaComMenosOpcoes = null, xcelulaComMenosOpcoes = null, ycelulaComMenosOpcoes = null;
+
+            const unicaOpcao = document.querySelector('.unicaOpcao');
+            if (unicaOpcao) {
+                xcelulaComMenosOpcoes = unicaOpcao.parentElement.dataset.row
+                ycelulaComMenosOpcoes = unicaOpcao.parentElement.dataset.column
+                possibilidades[xcelulaComMenosOpcoes][ycelulaComMenosOpcoes] = [];
+                tabuleiro[xcelulaComMenosOpcoes][ycelulaComMenosOpcoes] = Number(unicaOpcao.innerHTML)
+            }
+            else {
+                for (let i = 0; i < possibilidades.length; i++) {
+                    const linha = possibilidades[i];
+                    for (let j = 0; j < linha.length; j++) {
+                        const cell = linha[j];
+                        if (cell.length > 0 && (
+                            !celulaComMenosOpcoes || cell.length < celulaComMenosOpcoes.length
+                        )) {
+                            celulaComMenosOpcoes = [...cell];
+                            xcelulaComMenosOpcoes = i;
+                            ycelulaComMenosOpcoes = j;
+                        }
+                    }
+                }
+
+                possibilidades[xcelulaComMenosOpcoes][ycelulaComMenosOpcoes] = [];
+                const opcao = Math.floor(Math.random() * celulaComMenosOpcoes.length)
+                tabuleiro[xcelulaComMenosOpcoes][ycelulaComMenosOpcoes] = celulaComMenosOpcoes[opcao];
+            }
+
+            desenhaJogo();
+        }
+
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        async function preencher() {
+            for (let i = 0; i < 81; i++) {
+                marcaProximo()
+                await sleep(5);
+            }
+        }
+
+        iniciaJogoVazio()
     </script>
 </body>
 
